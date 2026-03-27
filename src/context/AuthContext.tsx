@@ -54,16 +54,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isValidConfig) {
+      console.error('Supabase configuration is invalid.');
       setLoading(false);
       return;
     }
 
-    // Initialize session and handle potential redirect fragments
     const initSession = async () => {
       try {
+        console.log('Initializing session...');
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
+        if (error) {
+          console.error('Get session error:', error);
+          throw error;
+        }
         
+        console.log('Session data:', session);
         if (session?.user) {
           setUser({
             uid: session.user.id,
@@ -87,7 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
+      console.log('Auth state changed event:', event);
+      console.log('Auth state changed session:', session);
+      
       if (session?.user) {
         setUser({
           uid: session.user.id,
@@ -119,14 +126,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    console.log('Initiating Google Sign-In...');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
         redirectTo: window.location.origin,
         skipBrowserRedirect: false,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
-    if (error) throw error;
+    if (error) {
+      console.error('Google Sign-In error:', error);
+      throw error;
+    }
   };
 
   const sendEmailLink = async (email: string) => {
