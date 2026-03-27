@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { user, signInWithGoogle, sendEmailLink, completeEmailSignIn, isAdmin } = useAuth();
+  const { user, signInWithGoogle, sendEmailLink, completeEmailSignIn, isAdmin, isNewUser, completeRegistration } = useAuth();
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,11 +21,11 @@ export default function LoginPage() {
     if (user) {
       if (isAdmin) {
         navigate('/admin');
-      } else {
+      } else if (!isNewUser) {
         navigate('/');
       }
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, isNewUser, navigate]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -65,14 +65,29 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">
-            Welcome to Ethio-cosmos-learning-community
+            {isNewUser ? 'Complete Your Profile' : 'Welcome to Ethio-cosmos-learning-community'}
           </h1>
           <p className="text-gray-400">
-            Sign in to continue your cosmic journey
+            {isNewUser ? 'One last step to join the community' : 'Sign in to continue your cosmic journey'}
           </p>
         </div>
 
-        {emailSent ? (
+        {isNewUser ? (
+          <div className="text-center py-8">
+            <div className="text-5xl mb-4">✨</div>
+            <h2 className="text-xl font-bold text-white mb-4">Ready to Explore?</h2>
+            <p className="text-gray-400 mb-8">
+              Click the button below to finish your registration and start your cosmic journey.
+            </p>
+            <Button 
+              onClick={() => completeRegistration()}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={loading}
+            >
+              Complete Registration
+            </Button>
+          </div>
+        ) : emailSent ? (
           <div className="text-center py-8">
             <div className="text-5xl mb-4">📧</div>
             <h2 className="text-xl font-bold text-white mb-2">Check Your Email</h2>

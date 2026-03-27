@@ -11,6 +11,8 @@ interface AuthContextType {
   completeEmailSignIn: () => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: boolean;
+  isNewUser: boolean;
+  completeRegistration: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +25,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [onlineUsers, setOnlineUsers] = useState(0);
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const isAdmin = user?.email === ADMIN_EMAIL;
+  const [isNewUser, setIsNewUser] = useState(false);
+
+  const completeRegistration = async () => {
+    if (!user) return;
+    const { error } = await supabase.auth.updateUser({
+      data: { registration_completed: true }
+    });
+    if (error) throw error;
+    setIsNewUser(false);
+  };
 
   const joinPresence = (userId: string) => {
     if (presenceChannelRef.current) {
@@ -80,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               null,
             photoURL: session.user.user_metadata?.avatar_url ?? null,
           });
+          setIsNewUser(!session.user.user_metadata?.registration_completed);
           joinPresence(session.user.id);
         }
       } catch (err) {
@@ -106,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             null,
           photoURL: session.user.user_metadata?.avatar_url ?? null,
         });
+        setIsNewUser(!session.user.user_metadata?.registration_completed);
         joinPresence(session.user.id);
       } else {
         setUser(null);
@@ -168,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, onlineUsers, signInWithGoogle, sendEmailLink, completeEmailSignIn, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, onlineUsers, signInWithGoogle, sendEmailLink, completeEmailSignIn, logout, isAdmin, isNewUser, completeRegistration }}>
       {children}
     </AuthContext.Provider>
   );
