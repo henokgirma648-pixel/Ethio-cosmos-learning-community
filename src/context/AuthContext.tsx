@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Initialize session
+    // Initialize session and handle potential redirect fragments
     const initSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event);
+      console.log('Auth state changed:', event);
       if (session?.user) {
         setUser({
           uid: session.user.id,
@@ -118,20 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       alert('Supabase configuration missing.');
       return;
     }
-    
-    // Clear any existing session fragments before starting new OAuth
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
         redirectTo: window.location.origin,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        }
+        skipBrowserRedirect: false,
       },
     });
     if (error) throw error;
