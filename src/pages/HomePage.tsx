@@ -1,15 +1,26 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 
 
 export default function HomePage() {
   const { heroTitle, heroSubtitle, featureCards, featuredTopics } = useData();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const scrollToFeatures = () => {
     const element = document.getElementById('feature-cards');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleBeginJourney = () => {
+    if (user) {
+      navigate('/learning');
+    } else {
+      navigate('/login');
     }
   };
 
@@ -33,11 +44,13 @@ export default function HomePage() {
               {heroSubtitle}
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/learning">
-                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white px-8">
-                  Begin Your Journey
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                className="bg-orange-500 hover:bg-orange-600 text-white px-8"
+                onClick={handleBeginJourney}
+              >
+                Begin Your Journey
+              </Button>
               <Button 
                 size="lg" 
                 variant="outline" 

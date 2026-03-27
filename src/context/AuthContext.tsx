@@ -58,29 +58,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    console.log('Auth Initializing...');
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('Initial Session:', session ? 'User Found' : 'No User');
-      if (error) console.error('Session Error:', error.message);
-      
-      if (session?.user) {
-        setUser({
-          uid: session.user.id,
-          email: session.user.email ?? null,
-          displayName:
-            session.user.user_metadata?.full_name ||
-            session.user.user_metadata?.name ||
-            session.user.email?.split('@')[0] ||
-            null,
-          photoURL: session.user.user_metadata?.avatar_url ?? null,
-        });
-        joinPresence(session.user.id);
+    // Initialize session
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        if (session?.user) {
+          setUser({
+            uid: session.user.id,
+            email: session.user.email ?? null,
+            displayName:
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split('@')[0] ||
+              null,
+            photoURL: session.user.user_metadata?.avatar_url ?? null,
+          });
+          joinPresence(session.user.id);
+        }
+      } catch (err) {
+        console.error('Session initialization error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth State Change:', event, session ? 'User Found' : 'No User');
+    initSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event);
       if (session?.user) {
         setUser({
           uid: session.user.id,
@@ -108,30 +115,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     if (!isValidConfig) {
-      alert('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file.');
+      alert('Supabase configuration missing.');
       return;
     }
+    
+    // Clear any existing session fragments before starting new OAuth
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/` },
+      options: { 
+        redirectTo: window.location.origin,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      },
     });
     if (error) throw error;
   };
 
   const sendEmailLink = async (email: string) => {
     if (!isValidConfig) {
-      alert('Supabase is not configured. Please add your credentials to the .env file.');
+      alert('Supabase configuration missing.');
       return;
     }
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/` },
+      options: { emailRedirectTo: window.location.origin },
     });
     if (error) throw error;
   };
 
   const completeEmailSignIn = async () => {
-    // Supabase handles magic link automatically via onAuthStateChange
+    // Handled by onAuthStateChange
   };
 
   const logout = async () => {
