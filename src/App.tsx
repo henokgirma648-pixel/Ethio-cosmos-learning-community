@@ -23,7 +23,7 @@ function App() {
         <Router>
           <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 pt-28">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/learning" element={<LearningPage />} />
