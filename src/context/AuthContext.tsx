@@ -58,7 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    console.log('Auth Initializing...');
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Initial Session:', session ? 'User Found' : 'No User');
+      if (error) console.error('Session Error:', error.message);
+      
       if (session?.user) {
         setUser({
           uid: session.user.id,
@@ -75,7 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth State Change:', event, session ? 'User Found' : 'No User');
       if (session?.user) {
         setUser({
           uid: session.user.id,
