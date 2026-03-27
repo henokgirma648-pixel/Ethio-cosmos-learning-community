@@ -24,16 +24,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(user?.email === ADMIN_EMAIL);
+  }, [user]);
 
   const completeRegistration = async () => {
     if (!user) return;
-    const { error } = await supabase.auth.updateUser({
-      data: { registration_completed: true }
-    });
-    if (error) throw error;
-    setIsNewUser(false);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { registration_completed: true }
+      });
+      if (error) throw error;
+      
+      // Also update local state immediately
+      setIsNewUser(false);
+      
+      // Optional: Refresh session to ensure metadata is up to date
+      await supabase.auth.refreshSession();
+    } catch (err) {
+      console.error('Error completing registration:', err);
+      throw err;
+    }
   };
 
   const joinPresence = (userId: string) => {
@@ -92,7 +106,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               null,
             photoURL: session.user.user_metadata?.avatar_url ?? null,
           });
-          setIsNewUser(!session.user.user_metadata?.registration_completed);
+          // If it's the admin, they are never "new" for onboarding purposes
+          const isUserAdmin = session.user.email === ADMIN_EMAIL;
+          setIsNewUser(!isUserAdmin && !session.user.user_metadata?.registration_completed);
           joinPresence(session.user.id);
         }
       } catch (err) {
@@ -119,7 +135,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             null,
           photoURL: session.user.user_metadata?.avatar_url ?? null,
         });
-        setIsNewUser(!session.user.user_metadata?.registration_completed);
+        const isUserAdmin = session.user.email === ADMIN_EMAIL;
+        setIsNewUser(!isUserAdmin && !session.user.user_metadata?.registration_completed);
         joinPresence(session.user.id);
       } else {
         setUser(null);

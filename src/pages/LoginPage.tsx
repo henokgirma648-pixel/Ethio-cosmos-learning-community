@@ -19,9 +19,16 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
+      // Prioritize admin redirect
       if (isAdmin) {
+        console.log('Admin detected, navigating to /admin');
         navigate('/admin');
-      } else if (!isNewUser) {
+        return;
+      }
+      
+      // If not admin and registration is complete, go home
+      if (!isNewUser) {
+        console.log('Regular user with completed registration, navigating to /');
         navigate('/');
       }
     }
