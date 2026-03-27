@@ -4,23 +4,18 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 
-const mainNavLinks = [
+const publicNavLinks = [
   { path: '/', label: 'Home' },
   { path: '/learning', label: 'Learning' },
   { path: '/materials', label: 'Materials' },
   { path: '/about', label: 'About' },
-  { path: '/tests', label: 'Tests' },
-  { path: '/chat', label: 'Chat' },
-  { path: '/bookmarks', label: 'Bookmarks' },
-  { path: '/progress', label: 'Progress' },
 ];
 
-const secondNavLinks = [
-  { path: '/', label: 'Home' },
-  { path: '/learning', label: 'Learning' },
-  { path: '/materials', label: 'Materials' },
+const privateNavLinks = [
   { path: '/chat', label: 'Chat' },
-  { path: '/about', label: 'About' },
+  { path: '/tests', label: 'Tests' },
+  { path: '/bookmarks', label: 'Bookmarks' },
+  { path: '/progress', label: 'Progress' },
 ];
 
 export default function Navbar() {
@@ -54,7 +49,20 @@ export default function Navbar() {
 
             {/* Desktop Navigation (Main) */}
             <div className="hidden lg:flex items-center gap-1">
-              {mainNavLinks.map((link) => (
+              {publicNavLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                    isActive(link.path)
+                      ? 'text-orange-500 bg-orange-500/10'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {user && privateNavLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
@@ -117,7 +125,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-12">
             <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar">
-              {secondNavLinks.map((link) => (
+              {publicNavLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
@@ -133,6 +141,21 @@ export default function Navbar() {
                   )}
                 </Link>
               ))}
+              {user && (
+                <Link
+                  to="/chat"
+                  className={`relative px-1 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive('/chat')
+                      ? 'text-orange-500'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Chat
+                  {isActive('/chat') && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                  )}
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -142,7 +165,21 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-slate-950 border-b border-white/10 py-4 px-4">
           <div className="flex flex-col gap-1">
-            {mainNavLinks.map((link) => (
+            {publicNavLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                  isActive(link.path)
+                    ? 'text-orange-500 bg-orange-500/10'
+                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {user && privateNavLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
