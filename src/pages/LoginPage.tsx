@@ -7,10 +7,10 @@ import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { user, signInWithGoogle, sendEmailLink, completeEmailSignIn, isAdmin, isNewUser, completeRegistration } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, sendEmailLink, completeEmailSignIn, isAdmin, isNewUser, completeRegistration } = useAuth();
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     // Handle email sign-in link
@@ -18,30 +18,29 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (!authLoading && user) {
       // Prioritize admin redirect
       if (isAdmin) {
         console.log('Admin detected, navigating to /admin');
-        navigate('/admin');
+        navigate('/admin', { replace: true });
         return;
       }
       
       // If not admin and registration is complete, go home
       if (!isNewUser) {
         console.log('Regular user with completed registration, navigating to /');
-        navigate('/');
+        navigate('/', { replace: true });
       }
     }
-  }, [user, isAdmin, isNewUser, navigate]);
+  }, [user, isAdmin, isNewUser, authLoading, navigate]);
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setActionLoading(true);
     try {
       await signInWithGoogle();
     } catch (error) {
       console.error('Sign-in error:', error);
-    } finally {
-      setLoading(false);
+      setActionLoading(false); // Only reset on error, as success will redirect
     }
   };
 
@@ -49,14 +48,14 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email) return;
     
-    setLoading(true);
+    setActionLoading(true);
     try {
       await sendEmailLink(email);
       setEmailSent(true);
     } catch (error) {
       console.error('Email link error:', error);
     } finally {
-      setLoading(false);
+      setActionLoading(false);
     }
   };
 
@@ -87,11 +86,20 @@ export default function LoginPage() {
               Click the button below to finish your registration and start your cosmic journey.
             </p>
             <Button 
-              onClick={() => completeRegistration()}
+              onClick={async () => {
+                setActionLoading(true);
+                try {
+                  await completeRegistration();
+                } catch (error) {
+                  console.error('Registration error:', error);
+                } finally {
+                  setActionLoading(false);
+                }
+              }}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-              disabled={loading}
+              disabled={actionLoading}
             >
-              Complete Registration
+              {actionLoading ? 'Processing...' : 'Complete Registration'}
             </Button>
           </div>
         ) : emailSent ? (
@@ -109,7 +117,7 @@ export default function LoginPage() {
               variant="outline" 
               className="w-full bg-white text-gray-900 hover:bg-gray-100 border-0 mb-6"
               onClick={handleGoogleSignIn}
-              disabled={loading}
+              disabled={actionLoading || authLoading}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -153,9 +161,9 @@ export default function LoginPage() {
               <Button 
                 type="submit"
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                disabled={loading}
+                disabled={actionLoading || authLoading}
               >
-                Continue
+                {actionLoading ? 'Sending...' : 'Continue'}
               </Button>
             </form>
           </>

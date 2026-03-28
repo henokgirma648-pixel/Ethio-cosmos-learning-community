@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User as UserIcon, LogOut, BookOpen, BarChart3 } from 'lucide-react';
 
 const publicNavLinks = [
   { path: '/', label: 'Home' },
@@ -20,8 +20,32 @@ const privateNavLinks = [
 
 export default function Navbar() {
   const location = useLocation();
-  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setProfileMenuOpen(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -89,16 +113,58 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Right side - Get Started button */}
+            {/* Right side - User Profile / Get Started */}
             <div className="flex items-center gap-2">
               {user ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-300 text-sm hidden md:inline">{user.displayName || user.email}</span>
-                  <Link to="/login">
-                    <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
-                      Account
-                    </Button>
-                  </Link>
+                <div className="relative" ref={profileMenuRef}>
+                  <button
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                    className="flex items-center gap-2 p-1 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
+                  >
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-orange-500/50" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <UserIcon size={18} />
+                      </div>
+                    )}
+                    <span className="text-gray-300 text-sm hidden md:inline max-w-[120px] truncate">
+                      {user.displayName || user.email?.split('@')[0]}
+                    </span>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  {profileMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-white/10 rounded-lg shadow-xl py-2 z-[60]">
+                      <div className="px-4 py-2 border-b border-white/5 mb-2">
+                        <p className="text-sm font-medium text-white truncate">{user.displayName || 'User'}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/progress"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                        onClick={() => setProfileMenuOpen(false)}
+                      >
+                        <BarChart3 size={16} />
+                        My Progress
+                      </Link>
+                      <Link
+                        to="/bookmarks"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                        onClick={() => setProfileMenuOpen(false)}
+                      >
+                        <BookOpen size={16} />
+                        Bookmarks
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors mt-2 border-t border-white/5 pt-2"
+                      >
+                        <LogOut size={16} />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link to="/login" className="hidden sm:block">

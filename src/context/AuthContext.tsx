@@ -85,47 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const initSession = async () => {
-      try {
-        console.log('Initializing session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Get session error:', error);
-          throw error;
-        }
-        
-        console.log('Session data:', session);
-        if (session?.user) {
-          setUser({
-            uid: session.user.id,
-            email: session.user.email ?? null,
-            displayName:
-              session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name ||
-              session.user.email?.split('@')[0] ||
-              null,
-            photoURL: session.user.user_metadata?.avatar_url ?? null,
-          });
-          // If it's the admin, they are never "new" for onboarding purposes
-          const isUserAdmin = session.user.email === ADMIN_EMAIL;
-          setIsNewUser(!isUserAdmin && !session.user.user_metadata?.registration_completed);
-          joinPresence(session.user.id);
-        }
-      } catch (err) {
-        console.error('Session initialization error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initSession();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed event:', event);
-      console.log('Auth state changed session:', session);
       
       if (session?.user) {
-        setUser({
+        const currentUser: User = {
           uid: session.user.id,
           email: session.user.email ?? null,
           displayName:
@@ -134,12 +98,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             session.user.email?.split('@')[0] ||
             null,
           photoURL: session.user.user_metadata?.avatar_url ?? null,
-        });
+        };
+        setUser(currentUser);
+        
         const isUserAdmin = session.user.email === ADMIN_EMAIL;
-        setIsNewUser(!isUserAdmin && !session.user.user_metadata?.registration_completed);
+        const registrationCompleted = session.user.user_metadata?.registration_completed === true;
+        
+        // Only set isNewUser if it's NOT the admin and NOT already completed
+        setIsNewUser(!isUserAdmin && !registrationCompleted);
         joinPresence(session.user.id);
       } else {
         setUser(null);
+        setIsNewUser(false);
         leavePresence();
       }
       setLoading(false);
