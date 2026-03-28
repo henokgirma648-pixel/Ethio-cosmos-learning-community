@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User as UserIcon, LogOut, BookOpen, BarChart3 } from 'lucide-react';
+import { Menu, X, User as UserIcon, LogOut, BookOpen, BarChart3, Settings } from 'lucide-react';
 
 const publicNavLinks = [
   { path: '/', label: 'Home' },
@@ -113,7 +113,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Right side - User Profile / Get Started */}
+            {/* Right side - User Profile / Login */}
             <div className="flex items-center gap-2">
               {user ? (
                 <div className="relative" ref={profileMenuRef}>
@@ -121,15 +121,19 @@ export default function Navbar() {
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                     className="flex items-center gap-2 p-1 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
                   >
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-orange-500/50" />
+                    {user.user_metadata?.avatar_url ? (
+                      <img 
+                        src={user.user_metadata.avatar_url} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full border border-orange-500/50" 
+                      />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
                         <UserIcon size={18} />
                       </div>
                     )}
                     <span className="text-gray-300 text-sm hidden md:inline max-w-[120px] truncate">
-                      {user.displayName || user.email?.split('@')[0]}
+                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
                     </span>
                   </button>
 
@@ -137,7 +141,9 @@ export default function Navbar() {
                   {profileMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-white/10 rounded-lg shadow-xl py-2 z-[60]">
                       <div className="px-4 py-2 border-b border-white/5 mb-2">
-                        <p className="text-sm font-medium text-white truncate">{user.displayName || 'User'}</p>
+                        <p className="text-sm font-medium text-white truncate">
+                          {user.user_metadata?.full_name || 'User'}
+                        </p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                       </div>
                       <Link
@@ -156,6 +162,16 @@ export default function Navbar() {
                         <BookOpen size={16} />
                         Bookmarks
                       </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                          onClick={() => setProfileMenuOpen(false)}
+                        >
+                          <Settings size={16} />
+                          Admin Panel
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors mt-2 border-t border-white/5 pt-2"
@@ -167,9 +183,9 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="hidden sm:block">
+                <Link to="/login">
                   <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
-                    Get Started
+                    Login
                   </Button>
                 </Link>
               )}
@@ -278,7 +294,7 @@ export default function Navbar() {
                 className="px-3 py-2 text-sm font-medium text-orange-500 hover:bg-orange-500/10 rounded-md mt-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Get Started
+                Login
               </Link>
             )}
           </div>

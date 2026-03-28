@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { DataProvider } from '@/context/DataContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -16,31 +16,65 @@ import TestsPage from '@/pages/TestsPage';
 import BookmarksPage from '@/pages/BookmarksPage';
 import ProgressPage from '@/pages/ProgressPage';
 
+// Protected Route Component
+const ProtectedRoute = ({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) => {
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+function AppRoutes() {
+  return (
+    <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
+      <Navbar />
+      <main className="flex-1 pt-28">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/learning" element={<LearningPage />} />
+          <Route path="/learning/:topicId" element={<TopicDetailPage />} />
+          <Route path="/learning/:topicId/:lessonId" element={<LessonPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/materials" element={<MaterialsPage />} />
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Routes */}
+          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+          <Route path="/tests" element={<ProtectedRoute><TestsPage /></ProtectedRoute>} />
+          <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
+          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+
+          {/* Admin Route */}
+          <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <DataProvider>
         <Router>
-          <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
-            <Navbar />
-            <main className="flex-1 pt-28">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/learning" element={<LearningPage />} />
-                <Route path="/learning/:topicId" element={<TopicDetailPage />} />
-                <Route path="/learning/:topicId/:lessonId" element={<LessonPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/materials" element={<MaterialsPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/tests" element={<TestsPage />} />
-                <Route path="/bookmarks" element={<BookmarksPage />} />
-                <Route path="/progress" element={<ProgressPage />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <AppRoutes />
         </Router>
       </DataProvider>
     </AuthProvider>
