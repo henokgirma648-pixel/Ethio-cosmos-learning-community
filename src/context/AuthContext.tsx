@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { supabase } from '@/supabase';
+import type { User } from '@/types';
 
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   loading: boolean;
   isAdmin: boolean;
   signInWithGoogle: () => Promise<void>;
@@ -14,22 +15,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAIL = 'henokgirma648@gmail.com';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const mapSupabaseUser = (supabaseUser: any): User | null => {
+    if (!supabaseUser) return null;
+    return {
+      uid: supabaseUser.id,
+      email: supabaseUser.email ?? null,
+      displayName: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || null,
+      photoURL: supabaseUser.user_metadata?.avatar_url || null,
+    };
+  };
 
   useEffect(() => {
     // Initial session check
     const initSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(mapSupabaseUser(session?.user));
+      } catch (error) {
+        console.error('Session init error:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     initSession();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      setUser(mapSupabaseUser(session?.user));
       setLoading(false);
     });
 
