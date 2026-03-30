@@ -9,7 +9,7 @@ import type { ChatMessage } from '@/types';
 
 export default function ChatPage() {
   const navigate = useNavigate();
-  const { user, onlineUsers } = useAuth();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -147,13 +147,13 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen pt-16 bg-[#0a0e1a] flex flex-col">
-      {/* Online Users Badge */}
+      {/* Header Area */}
       <div className="bg-slate-900 border-b border-white/10 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">Community Chat</h1>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            {onlineUsers} users online
+            Live Community
           </div>
         </div>
       </div>

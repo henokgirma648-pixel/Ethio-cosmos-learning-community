@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
-import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 
 export default function AboutPage() {
   const { missionText, whoWeAreText1, whoWeAreText2, missionImage, whoWeAreImage1, whoWeAreImage2 } = useData();
-  const { onlineUsers } = useAuth();
 
   const offerCards = [
     {
@@ -147,10 +145,10 @@ export default function AboutPage() {
             Connect with fellow space explorers, share your sightings, participate in events, and stay updated with the latest astronomical news. Join us in unravelling the mysteries of the night sky.
           </p>
           
-          {/* Online Users Badge */}
+          {/* Online Users Badge - Simplified */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-8">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            {onlineUsers} users currently online
+            Community members online
           </div>
           
           <div>
