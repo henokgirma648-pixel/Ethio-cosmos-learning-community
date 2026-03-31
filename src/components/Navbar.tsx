@@ -54,6 +54,9 @@ export default function Navbar() {
     return location.pathname.startsWith(path);
   };
 
+  // Helper to safely access user metadata
+  const metadata = user ? (user as any).user_metadata : null;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col">
       {/* Top Main Navbar */}
@@ -121,9 +124,9 @@ export default function Navbar() {
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                     className="flex items-center gap-2 p-1 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
                   >
-                    {user.user_metadata?.avatar_url ? (
+                    {metadata?.avatar_url ? (
                       <img 
-                        src={user.user_metadata.avatar_url} 
+                        src={metadata.avatar_url} 
                         alt="Profile" 
                         className="w-8 h-8 rounded-full border border-orange-500/50" 
                       />
@@ -133,7 +136,7 @@ export default function Navbar() {
                       </div>
                     )}
                     <span className="text-gray-300 text-sm hidden md:inline max-w-[120px] truncate">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                      {metadata?.full_name || user.email?.split('@')[0]}
                     </span>
                   </button>
 
@@ -142,7 +145,7 @@ export default function Navbar() {
                     <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-white/10 rounded-lg shadow-xl py-2 z-[60]">
                       <div className="px-4 py-2 border-b border-white/5 mb-2">
                         <p className="text-sm font-medium text-white truncate">
-                          {user.user_metadata?.full_name || 'User'}
+                          {metadata?.full_name || 'User'}
                         </p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                       </div>

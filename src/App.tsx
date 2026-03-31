@@ -15,9 +15,10 @@ import AdminPage from '@/pages/AdminPage';
 import TestsPage from '@/pages/TestsPage';
 import BookmarksPage from '@/pages/BookmarksPage';
 import ProgressPage from '@/pages/ProgressPage';
+import type { ReactNode } from 'react';
 
 // Protected Route Component
-const ProtectedRoute = ({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) => {
+const ProtectedRoute = ({ children, adminOnly = false }: { children: ReactNode, adminOnly?: boolean }) => {
   const { user, loading, isAdmin } = useAuth();
 
   if (loading) {
@@ -36,7 +37,7 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: JSX.Element
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 function AppRoutes() {
