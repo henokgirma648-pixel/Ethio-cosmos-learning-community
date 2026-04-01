@@ -44,13 +44,15 @@ export default function HomePage() {
               {heroSubtitle}
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button 
-                size="lg" 
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8"
-                onClick={handleBeginJourney}
-              >
-                Begin Your Journey
-              </Button>
+              {!user && (
+                <Button 
+                  size="lg" 
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8"
+                  onClick={handleBeginJourney}
+                >
+                  Begin Your Journey
+                </Button>
+              )}
               <Button 
                 size="lg" 
                 variant="outline" 
