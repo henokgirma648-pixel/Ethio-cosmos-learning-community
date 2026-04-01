@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Minimal redirect: If user is authenticated and not loading, go to home
   useEffect(() => {
     if (!loading && user) {
       navigate('/', { replace: true });
@@ -22,6 +23,7 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     setActionLoading(true);
+    setAuthError(null);
     try {
       await signInWithGoogle();
     } catch (error: any) {
@@ -44,7 +46,9 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
-        alert('Registration successful! Please check your email for a confirmation link.');
+        // After signup, Supabase usually logs the user in automatically or sends a confirmation email.
+        // We'll show a message but the useEffect above will handle the redirect if they are auto-logged in.
+        alert('Registration successful! Please check your email for a confirmation link if required.');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { supabase } from '@/supabase';
-import type { User } from '@/types';
+import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -18,22 +18,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const mapSupabaseUser = (supabaseUser: any): User | null => {
-    if (!supabaseUser) return null;
-    return {
-      uid: supabaseUser.id,
-      email: supabaseUser.email ?? null,
-      displayName: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || null,
-      photoURL: supabaseUser.user_metadata?.avatar_url || null,
-    };
-  };
-
   useEffect(() => {
     // Initial session check
     const initSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        setUser(mapSupabaseUser(session?.user));
+        setUser(session?.user ?? null);
       } catch (error) {
         console.error('Session init error:', error);
       } finally {
@@ -45,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(mapSupabaseUser(session?.user));
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 

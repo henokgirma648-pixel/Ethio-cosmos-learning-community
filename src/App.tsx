@@ -21,6 +21,7 @@ import type { ReactNode } from 'react';
 const ProtectedRoute = ({ children, adminOnly = false }: { children: ReactNode, adminOnly?: boolean }) => {
   const { user, loading, isAdmin } = useAuth();
 
+  // If loading, show nothing or a loader
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
@@ -29,10 +30,12 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: ReactNode, 
     );
   }
 
+  // If no user, go to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  // If admin required but not admin, go to home
   if (adminOnly && !isAdmin) {
     return <Navigate to="/" replace />;
   }
