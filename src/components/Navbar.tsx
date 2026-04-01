@@ -74,47 +74,51 @@ export default function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop Navigation (Main) */}
-            <div className="hidden lg:flex items-center gap-1">
-              {publicNavLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
-                    isActive(link.path)
-                      ? 'text-orange-500 bg-orange-500/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {user && privateNavLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
-                    isActive(link.path)
-                      ? 'text-orange-500 bg-orange-500/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
-                    isActive('/admin')
-                      ? 'text-orange-500 bg-orange-500/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  Admin
-                </Link>
-              )}
-            </div>
+	            {/* Desktop Navigation (Main) */}
+	            <div className="hidden lg:flex items-center gap-1">
+	              {publicNavLinks.map((link) => (
+	                <Link
+	                  key={link.path}
+	                  to={link.path}
+	                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+	                    isActive(link.path)
+	                      ? 'text-orange-500 bg-orange-500/10'
+	                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+	                  }`}
+	                >
+	                  {link.label}
+	                </Link>
+	              ))}
+	              {user && (
+	                <>
+	                  {privateNavLinks.map((link) => (
+	                    <Link
+	                      key={link.path}
+	                      to={link.path}
+	                      className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+	                        isActive(link.path)
+	                          ? 'text-orange-500 bg-orange-500/10'
+	                          : 'text-gray-300 hover:text-white hover:bg-white/5'
+	                      }`}
+	                    >
+	                      {link.label}
+	                    </Link>
+	                  ))}
+	                  {isAdmin && (
+	                    <Link
+	                      to="/admin"
+	                      className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+	                        isActive('/admin')
+	                          ? 'text-orange-500 bg-orange-500/10'
+	                          : 'text-gray-300 hover:text-white hover:bg-white/5'
+	                      }`}
+	                    >
+	                      Admin
+	                    </Link>
+	                  )}
+	                </>
+	              )}
+	            </div>
 
 	            {/* Right side - User Profile / Login */}
 	            <div className="flex items-center gap-2">
