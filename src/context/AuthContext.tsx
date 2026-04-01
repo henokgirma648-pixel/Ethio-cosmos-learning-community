@@ -18,32 +18,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Initial session check
-    const initSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-      } catch (error) {
-        console.error('Session init error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initSession();
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change:', event, session?.user?.email);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+	  useEffect(() => {
+	    // Initial session check
+	    const initSession = async () => {
+	      try {
+	        const { data: { session }, error } = await supabase.auth.getSession();
+	        if (error) throw error;
+	        console.log('Initial session check:', session?.user?.email);
+	        setUser(session?.user ?? null);
+	      } catch (error) {
+	        console.error('Session init error:', error);
+	      } finally {
+	        setLoading(false);
+	      }
+	    };
+	
+	    initSession();
+	
+	    // Listen for auth state changes
+	    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+	      console.log('Auth state change event:', event);
+	      console.log('Auth state change user:', session?.user?.email);
+	      
+	      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+	        setUser(session?.user ?? null);
+	      } else if (event === 'SIGNED_OUT') {
+	        setUser(null);
+	      }
+	      
+	      setLoading(false);
+	    });
+	
+	    return () => {
+	      subscription.unsubscribe();
+	    };
+	  }, []);
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({

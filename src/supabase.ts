@@ -14,12 +14,12 @@ if (!isValidConfig) {
 
 export const supabase = isValidConfig
   ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce',
-      },
+	      auth: {
+	        autoRefreshToken: true,
+	        persistSession: true,
+	        detectSessionInUrl: true,
+	        flowType: 'implicit',
+	      },
     })
   : createClient('https://placeholder.supabase.co', 'placeholder');
 
