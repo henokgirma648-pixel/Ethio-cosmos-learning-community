@@ -26,6 +26,7 @@ export default function LoginPage() {
     setAuthError(null);
     try {
       await signInWithGoogle();
+      // The redirect is handled by Supabase and the auth listener in AuthContext
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       setAuthError(error.message || 'An error occurred during Google sign-in.');
@@ -41,14 +42,19 @@ export default function LoginPage() {
     setAuthError(null);
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
-        // After signup, Supabase usually logs the user in automatically or sends a confirmation email.
-        // We'll show a message but the useEffect above will handle the redirect if they are auto-logged in.
-        alert('Registration successful! Please check your email for a confirmation link if required.');
+        // After signup, check if user is already logged in (auto-login)
+        if (data.user) {
+          // User is auto-logged in, the useEffect will handle the redirect
+          console.log('User registered and auto-logged in:', data.user.email);
+        } else {
+          // User needs to confirm email
+          alert('Registration successful! Please check your email for a confirmation link.');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,

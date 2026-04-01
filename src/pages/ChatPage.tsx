@@ -27,7 +27,7 @@ export default function ChatPage() {
 
     // Load existing messages
     supabase
-      .from('messages')
+      .from('chat_messages')
       .select('*')
       .order('created_at', { ascending: true })
       .then(({ data, error }) => {
@@ -35,11 +35,11 @@ export default function ChatPage() {
         if (data) {
           setMessages(data.map((m) => ({
             id: m.id,
-            senderId: m.sender_id,
-            senderName: m.sender_name,
-            senderEmail: m.sender_email,
-            text: m.text,
-            imageUrl: m.image_url,
+            senderId: m.user_id,
+            senderName: m.user_id, // Will be updated with user metadata
+            senderEmail: m.user_id, // Will be updated with user metadata
+            text: m.message_text,
+            imageUrl: undefined,
             timestamp: new Date(m.created_at).getTime(),
           })));
         }
@@ -50,21 +50,20 @@ export default function ChatPage() {
       .channel('messages-realtime')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
+        { event: 'INSERT', schema: 'public', table: 'chat_messages' },
         (payload) => {
           const m = payload.new as {
-            id: string; sender_id: string; sender_name: string;
-            sender_email: string; text?: string; image_url?: string; created_at: string;
+            id: string; user_id: string; message_text?: string; created_at: string;
           };
           setMessages((prev) => [
             ...prev,
             {
               id: m.id,
-              senderId: m.sender_id,
-              senderName: m.sender_name,
-              senderEmail: m.sender_email,
-              text: m.text,
-              imageUrl: m.image_url,
+              senderId: m.user_id,
+              senderName: m.user_id, // Will be updated with user metadata
+              senderEmail: m.user_id, // Will be updated with user metadata
+              text: m.message_text,
+              imageUrl: undefined,
               timestamp: new Date(m.created_at).getTime(),
             },
           ]);
@@ -88,11 +87,9 @@ export default function ChatPage() {
     }
     const text = newMessage.trim();
     setNewMessage('');
-    const { error } = await supabase.from('messages').insert({
-      sender_id: user.uid,
-      sender_name: user.displayName || user.email?.split('@')[0] || 'Anonymous',
-      sender_email: user.email,
-      text,
+    const { error } = await supabase.from('chat_messages').insert({
+      user_id: user.id,
+      message_text: text,
     });
     if (error) console.error('Error sending message:', error);
   };
@@ -113,11 +110,9 @@ export default function ChatPage() {
         .from('uploads')
         .getPublicUrl(filePath);
 
-      const { error: insertError } = await supabase.from('messages').insert({
-        sender_id: user.uid,
-        sender_name: user.displayName || user.email?.split('@')[0] || 'Anonymous',
-        sender_email: user.email,
-        image_url: publicUrl,
+      const { error: insertError } = await supabase.from('chat_messages').insert({
+        user_id: user.id,
+        message_text: `[Image: ${publicUrl}]`,
       });
       if (insertError) throw insertError;
     } catch (error) {
@@ -167,7 +162,7 @@ export default function ChatPage() {
             </div>
           ) : (
             messages.map((msg) => {
-              const isOwn = msg.senderId === user.uid;
+              const isOwn = msg.senderId === user.id;
               return (
                 <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[70%] rounded-lg px-4 py-2 ${isOwn ? 'bg-orange-500 text-white' : 'bg-slate-800 text-gray-200'}`}>
