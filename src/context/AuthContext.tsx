@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Initial session check
     const initSession = async () => {
       try {
+        console.log('[AuthContext] Initializing session...');
         const {
           data: { session },
           error,
@@ -55,10 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
 
         const u = session?.user ?? null;
+        console.log('[AuthContext] Initial session user:', u?.email);
         setUser(u);
         if (u) await loadProfile(u.id);
       } catch (err) {
-        console.error('Session init error:', err);
+        console.error('[AuthContext] Session init error:', err);
       } finally {
         setLoading(false);
       }
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       const u = session?.user ?? null;
+      console.log('[AuthContext] Auth state change:', event, u?.email);
 
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setUser(u);
