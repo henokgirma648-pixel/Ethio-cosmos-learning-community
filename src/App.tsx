@@ -58,7 +58,6 @@ function AppRoutes() {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/learning" element={<LearningPage />} />
-          {/* Use slug-based params throughout */}
           <Route path="/learning/:topicSlug" element={<TopicDetailPage />} />
           <Route path="/learning/:topicSlug/:lessonSlug" element={<LessonPage />} />
           <Route path="/about" element={<AboutPage />} />

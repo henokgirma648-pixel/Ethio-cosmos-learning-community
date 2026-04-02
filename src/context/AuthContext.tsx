@@ -118,7 +118,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
-  // Role is derived from DB profile, not from email string comparison
   const isAdmin = profile?.role === 'admin';
 
   return (

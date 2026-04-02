@@ -45,12 +45,10 @@ export default function LoginPage() {
       if (isSignUp) {
         const { needsConfirmation } = await signUpWithEmail(email, password);
         if (needsConfirmation) {
-          setInfoMessage('Registration successful! Please check your email for a confirmation link.');
+          setInfoMessage('Check your email to confirm your account');
         }
-        // If auto-logged-in, the useEffect above will redirect
       } else {
         await signInWithEmail(email, password);
-        // Auth listener in AuthContext + useEffect above will redirect
       }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Authentication failed. Please check your credentials.';

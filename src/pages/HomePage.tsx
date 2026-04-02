@@ -14,7 +14,7 @@ export default function HomePage() {
   };
 
   const handleBeginJourney = () => {
-    navigate(user ? '/learning' : '/login');
+    navigate('/login');
   };
 
   if (dataLoading) {
