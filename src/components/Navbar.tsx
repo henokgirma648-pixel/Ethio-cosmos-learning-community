@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User as UserIcon, LogOut, BookOpen, BarChart3, Settings, UserCircle } from 'lucide-react';
+import { Menu, X, User as UserIcon, LogOut, BookOpen, BarChart3, UserCircle } from 'lucide-react';
 
 const publicNavLinks = [
   { path: '/', label: 'Home' },
@@ -103,9 +103,9 @@ export default function Navbar() {
                         onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                         className="flex items-center gap-2 p-1 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
                       >
-                        {profile?.avatar_url ? (
+                        {profile?.avatarUrl ? (
                           <img 
-                            src={profile.avatar_url} 
+                            src={profile.avatarUrl} 
                             alt="Profile" 
                             className="w-8 h-8 rounded-full border border-orange-500/50" 
                           />
