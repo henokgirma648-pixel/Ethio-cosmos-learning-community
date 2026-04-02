@@ -1,51 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { fetchBookmarks, removeBookmark } from '@/services/bookmarks';
+import type { Bookmark } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bookmark, Trash2, ExternalLink } from 'lucide-react';
-
-interface BookmarkItem {
-  id: string;
-  title: string;
-  type: 'topic' | 'lesson';
-  url: string;
-  description: string;
-}
-
-const defaultBookmarks: BookmarkItem[] = [
-  {
-    id: '1',
-    title: 'Fundamentals of Astronomy',
-    type: 'topic',
-    url: '/learning/fundamentals',
-    description: 'Start your journey with the basics of astronomy and space observation'
-  },
-  {
-    id: '2',
-    title: 'Solar System',
-    type: 'topic',
-    url: '/learning/solar-system',
-    description: 'Our cosmic neighborhood and the Sun\'s family of planets'
-  },
-  {
-    id: '3',
-    title: 'Black Hole - Introduction',
-    type: 'lesson',
-    url: '/learning/black-hole/b1',
-    description: 'Understanding these mysterious objects'
-  }
-];
+import { Bookmark as BookmarkIcon, Trash2, ExternalLink, Loader2 } from 'lucide-react';
 
 export default function BookmarksPage() {
-  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(() => {
-    const saved = localStorage.getItem('ethioCosmosBookmarks');
-    return saved ? JSON.parse(saved) : defaultBookmarks;
-  });
+  const { user } = useAuth();
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<string | null>(null);
 
-  const removeBookmark = (id: string) => {
-    const newBookmarks = bookmarks.filter(b => b.id !== id);
-    setBookmarks(newBookmarks);
-    localStorage.setItem('ethioCosmosBookmarks', JSON.stringify(newBookmarks));
+  useEffect(() => {
+    if (!user) return;
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchBookmarks(user.id);
+        setBookmarks(data);
+      } catch (err) {
+        console.error('Bookmarks load error:', err);
+        setError('Failed to load bookmarks. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
+  }, [user]);
+
+  const handleRemove = async (id: string) => {
+    if (!user) return;
+    setRemoving(id);
+    try {
+      await removeBookmark(user.id, id);
+      setBookmarks((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      console.error('Remove bookmark error:', err);
+    } finally {
+      setRemoving(null);
+    }
   };
 
   return (
@@ -56,11 +55,21 @@ export default function BookmarksPage() {
           <p className="text-gray-400">Save and access your favorite learning materials</p>
         </div>
 
-        {bookmarks.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="text-orange-500 animate-spin" size={36} />
+          </div>
+        ) : error ? (
           <div className="text-center py-12">
-            <Bookmark size={48} className="text-gray-600 mx-auto mb-4" />
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : bookmarks.length === 0 ? (
+          <div className="text-center py-12">
+            <BookmarkIcon size={48} className="text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl text-white mb-2">No bookmarks yet</h3>
-            <p className="text-gray-400 mb-6">Start exploring and bookmark topics or lessons you want to revisit</p>
+            <p className="text-gray-400 mb-6">
+              Open any lesson and click the bookmark icon to save it here.
+            </p>
             <Link to="/learning">
               <Button className="bg-orange-500 hover:bg-orange-600 text-white">
                 Explore Learning
@@ -75,12 +84,14 @@ export default function BookmarksPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          bookmark.type === 'topic' 
-                            ? 'bg-blue-500/20 text-blue-400' 
-                            : 'bg-green-500/20 text-green-400'
-                        }`}>
-                          {bookmark.type === 'topic' ? 'Topic' : 'Lesson'}
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            bookmark.itemType === 'topic'
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'bg-green-500/20 text-green-400'
+                          }`}
+                        >
+                          {bookmark.itemType === 'topic' ? 'Topic' : 'Lesson'}
                         </span>
                       </div>
                       <h3 className="text-xl font-bold text-white mb-1">{bookmark.title}</h3>
@@ -88,16 +99,25 @@ export default function BookmarksPage() {
                     </div>
                     <div className="flex items-center gap-2 ml-4">
                       <Link to={bookmark.url}>
-                        <Button variant="outline" size="icon" className="border-white/20 text-white hover:bg-white/10">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="border-white/20 text-white hover:bg-white/10"
+                        >
                           <ExternalLink size={18} />
                         </Button>
                       </Link>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="icon"
-                        onClick={() => removeBookmark(bookmark.id)}
+                        onClick={() => handleRemove(bookmark.id)}
+                        disabled={removing === bookmark.id}
                       >
-                        <Trash2 size={18} />
+                        {removing === bookmark.id ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={18} />
+                        )}
                       </Button>
                     </div>
                   </div>

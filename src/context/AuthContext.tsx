@@ -1,58 +1,92 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import { supabase } from '@/supabase';
+import { fetchProfile } from '@/services/profiles';
 import type { User } from '@supabase/supabase-js';
+import type { UserProfile } from '@/types';
 
 interface AuthContextType {
   user: User | null;
+  profile: UserProfile | null;
   loading: boolean;
   isAdmin: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<{ needsConfirmation: boolean }>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_EMAIL = 'henokgirma648@gmail.com';
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-	  useEffect(() => {
-	    // Initial session check
-	    const initSession = async () => {
-	      try {
-	        const { data: { session }, error } = await supabase.auth.getSession();
-	        if (error) throw error;
-	        console.log('Initial session check:', session?.user?.email);
-	        setUser(session?.user ?? null);
-	      } catch (error) {
-	        console.error('Session init error:', error);
-	      } finally {
-	        setLoading(false);
-	      }
-	    };
-	
-	    initSession();
-	
-	    // Listen for auth state changes
-	    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-	      console.log('Auth state change event:', event);
-	      console.log('Auth state change user:', session?.user?.email);
-	      
-	      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-	        setUser(session?.user ?? null);
-	      } else if (event === 'SIGNED_OUT') {
-	        setUser(null);
-	      }
-	      
-	      setLoading(false);
-	    });
-	
-	    return () => {
-	      subscription.unsubscribe();
-	    };
-	  }, []);
+  const loadProfile = useCallback(async (userId: string) => {
+    try {
+      const p = await fetchProfile(userId);
+      setProfile(p);
+    } catch (err) {
+      console.error('loadProfile error:', err);
+      setProfile(null);
+    }
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (user) await loadProfile(user.id);
+  }, [user, loadProfile]);
+
+  useEffect(() => {
+    // Initial session check
+    const initSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) throw error;
+
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) await loadProfile(u.id);
+      } catch (err) {
+        console.error('Session init error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void initSession();
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const u = session?.user ?? null;
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setUser(u);
+        if (u) await loadProfile(u.id);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setProfile(null);
+      }
+
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [loadProfile]);
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -64,15 +98,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
+
+  const signUpWithEmail = async (
+    email: string,
+    password: string
+  ): Promise<{ needsConfirmation: boolean }> => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    // If data.user exists but session is null, email confirmation is required
+    return { needsConfirmation: !!data.user && !data.session };
+  };
+
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  // Role is derived from DB profile, not from email string comparison
+  const isAdmin = profile?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, signInWithGoogle, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        isAdmin,
+        signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        logout,
+        refreshProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -80,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
+  if (context === undefined)
+    throw new Error('useAuth must be used within an AuthProvider');
   return context;
 }

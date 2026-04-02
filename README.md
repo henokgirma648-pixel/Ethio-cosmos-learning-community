@@ -1,156 +1,146 @@
-# Ethio-cosmos-learning-community
+# 🔭 Ethio-cosmos Learning Community
 
-Astronomy learning platform — React + TypeScript + Tailwind CSS + Supabase + Vercel.
+A production-ready, multi-user astronomy learning platform built with React 19, TypeScript, Vite, and Supabase.
 
----
+## ✨ Features
 
-## STEP 1 — Create Your Supabase Project
+- **🔐 Authentication** – Google OAuth and Email/Password sign-up & sign-in via Supabase Auth
+- **👤 User Profiles** – Auto-created on sign-up with username derived from Google name or email prefix
+- **📚 Learning Topics & Lessons** – Supabase-backed topic/subtopic/lesson structure with slug-based routing
+- **💬 Real-time Community Chat** – Live chat with proper usernames (not UUIDs) via Supabase Realtime
+- **🔖 Bookmarks** – Per-user lesson bookmarks stored in Supabase
+- **📈 Progress Tracking** – Mark lessons complete; achievements based on completion count
+- **🧪 Database-driven Quizzes** – Quizzes and questions from Supabase; attempts saved per user
+- **🛠️ Admin CMS** – Full CRUD for topics, subtopics, lessons, quizzes, homepage/about/materials content
+- **🖼️ Media Fallbacks** – Graceful image, video, and PDF fallback UI
+- **🛡️ Row-Level Security** – All tables protected with Supabase RLS policies
 
-1. Go to https://supabase.com and create a free account
-2. Click "New Project" — name it ethio-cosmos, set a database password
-3. Wait for the project to finish setting up (about 1 minute)
-4. Go to Project Settings → API — you will find:
-   - Project URL → this is your VITE_SUPABASE_URL
-   - anon / public key → this is your VITE_SUPABASE_ANON_KEY
+## 🏗️ Tech Stack
 
----
+- **Frontend**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Backend**: Supabase (Auth, PostgreSQL, Realtime, Storage)
+- **Routing**: React Router DOM v6
+- **Deployment**: Vercel (recommended)
 
-## STEP 2 — Set Up Supabase Database Table
+## 🚀 Quick Start
 
-Go to your Supabase project → SQL Editor → New Query → paste this and click Run:
+### 1. Clone & Install
 
-```sql
--- Create messages table for chat
-create table if not exists messages (
-  id uuid default gen_random_uuid() primary key,
-  sender_id text not null,
-  sender_name text,
-  sender_email text,
-  text text,
-  image_url text,
-  created_at timestamp with time zone default now()
-);
-
--- Enable Row Level Security
-alter table messages enable row level security;
-
--- Allow signed-in users to read messages
-create policy "Authenticated users can read messages"
-  on messages for select
-  using (auth.role() = 'authenticated');
-
--- Allow signed-in users to insert messages
-create policy "Authenticated users can send messages"
-  on messages for insert
-  with check (auth.role() = 'authenticated');
-
--- Enable realtime on messages table
-alter publication supabase_realtime add table messages;
+```bash
+git clone https://github.com/henokgirma648-pixel/Ethio-cosmos-learning-community.git
+cd Ethio-cosmos-learning-community
+npm install
 ```
 
----
+### 2. Create Supabase Project
 
-## STEP 3 — Create Supabase Storage Bucket
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Copy your **Project URL** and **anon public key** from Project Settings → API
 
-1. Go to your Supabase project → Storage → New Bucket
-2. Name: uploads
-3. Public bucket: YES (toggle it on)
-4. Click Create
-5. Then go to Storage → Policies → uploads bucket → New Policy → choose "Allow all operations for authenticated users"
+### 3. Set up the Database
 
----
+1. In Supabase, go to **SQL Editor → New Query**
+2. Paste the entire contents of `supabase-schema.sql` and run it
+3. This creates all tables, RLS policies, triggers, and seeds default content
 
-## STEP 4 — Enable Google Auth in Supabase
+### 4. Set up Storage
 
-1. Go to Authentication → Providers → Google
-2. Toggle Enable Google provider ON
-3. Go to https://console.cloud.google.com
-4. Create a new project → APIs & Services → Credentials → Create OAuth 2.0 Client ID
-5. Application type: Web application
-6. Add Authorized redirect URI: https://your-project-id.supabase.co/auth/v1/callback
-7. Copy the Client ID and Client Secret back into Supabase Google provider settings
-8. Also add your site URL in Supabase: Authentication → URL Configuration → Site URL
+1. In Supabase, go to **Storage → New Bucket**
+2. Name: `uploads` | Public bucket: **Yes**
+3. Add a policy allowing authenticated users to insert/select/update/delete
 
----
+### 5. Set up Google OAuth (optional but recommended)
 
-## STEP 5 — Configure Your Environment Variables
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create OAuth 2.0 credentials
+3. Set authorized redirect URI to: `https://YOUR-PROJECT.supabase.co/auth/v1/callback`
+4. In Supabase → Authentication → Providers → Google: enable and paste client ID/secret
+5. Set Site URL in Supabase → Authentication → URL Configuration → Site URL
 
-1. Copy .env.example to a new file named exactly .env
-2. Fill in your values:
+### 6. Configure Environment Variables
 
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
 ```
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key-here
 ```
 
-NEVER push the .env file to GitHub. It is already protected by .gitignore.
-
----
-
-## STEP 6 — Run Locally
+### 7. Run Locally
 
 ```bash
-npm install
 npm run dev
+# Open http://localhost:5173
 ```
 
-Open http://localhost:5173
+## 🔑 Admin Access
 
----
+The admin panel is at `/admin`. Admin role is granted to `henokgirma648@gmail.com` automatically by the database trigger. To grant admin to another user, update their profile role in the Supabase dashboard:
 
-## STEP 7 — Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/ethio-cosmos-learning-community.git
-git push -u origin main
+```sql
+UPDATE public.profiles SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
-Make sure .env is NOT included (check .gitignore is working).
+## 📦 Deployment on Vercel
 
----
+1. Push to GitHub
+2. Import the repo at [vercel.com](https://vercel.com)
+3. Add environment variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+4. Deploy
+5. In Supabase → Auth → URL Configuration, add your Vercel URL as:
+   - **Site URL**: `https://your-app.vercel.app`
+   - **Redirect URLs**: `https://your-app.vercel.app/**`
 
-## STEP 8 — Deploy on Vercel
+## 🗂️ Project Structure
 
-1. Go to https://vercel.com — sign in with your GitHub account
-2. Click "Add New Project" → import ethio-cosmos-learning-community
-3. BEFORE clicking Deploy → go to "Environment Variables" section
-4. Add these two variables:
-   - VITE_SUPABASE_URL = your Supabase project URL
-   - VITE_SUPABASE_ANON_KEY = your Supabase anon key
-5. Click Deploy
-6. Go to Authentication → URL Configuration in Supabase and add your Vercel URL to:
-   - Site URL: https://your-app.vercel.app
-   - Redirect URLs: https://your-app.vercel.app/**
+```
+src/
+├── components/
+│   ├── MediaFallback.tsx    # Graceful image/video/PDF fallbacks
+│   ├── Navbar.tsx           # Fixed top navigation
+│   └── Footer.tsx
+├── context/
+│   ├── AuthContext.tsx      # Supabase auth, profile loading, role check
+│   └── DataContext.tsx      # Topics/subtopics/lessons + CMS state
+├── pages/
+│   ├── HomePage.tsx         # Hero + feature cards + featured topics
+│   ├── LearningPage.tsx     # Topics grid
+│   ├── TopicDetailPage.tsx  # Subtopics list (slug routing)
+│   ├── LessonPage.tsx       # Lesson content + bookmark + mark complete
+│   ├── ChatPage.tsx         # Real-time chat with profile usernames
+│   ├── TestsPage.tsx        # DB-driven quizzes with attempt saving
+│   ├── BookmarksPage.tsx    # User bookmarks from Supabase
+│   ├── ProgressPage.tsx     # Progress + achievements from Supabase
+│   ├── AdminPage.tsx        # Full CMS CRUD
+│   ├── LoginPage.tsx        # Google + email/password auth
+│   ├── AboutPage.tsx        # About page (DB-driven)
+│   └── MaterialsPage.tsx    # Gallery, videos, PDFs (DB-driven)
+├── services/
+│   ├── topics.ts            # Topics/subtopics/lessons CRUD
+│   ├── profiles.ts          # User profile CRUD + batch fetch
+│   ├── progress.ts          # Lesson completion tracking
+│   ├── bookmarks.ts         # Bookmark CRUD
+│   ├── quizzes.ts           # Quiz + question + attempt CRUD
+│   └── siteContent.ts       # Homepage/About/Materials CMS
+├── types/
+│   └── index.ts             # Full TypeScript types (DB + frontend)
+├── supabase.ts              # Supabase client with env validation
+└── App.tsx                  # Routes + ProtectedRoute + layout
+supabase-schema.sql          # Complete SQL schema with RLS + seeds
+```
 
-Your site is now live!
+## 🔒 Security
 
----
+- All Supabase tables have Row-Level Security enabled
+- Users can only read/write their own bookmarks and progress
+- Chat is readable by all authenticated users, writable only by message owner
+- Admin writes (topics, lessons, quizzes, CMS) require `role = 'admin'` in profiles
+- No secrets in client code; all credentials via environment variables
 
-## Admin Access
+## ⚠️ Environment Variables Note
 
-Sign in with henokgirma648@gmail.com to access the Admin Dashboard at /admin.
-
-From the admin dashboard you can:
-- Edit all page titles, subtitles, and text
-- Upload and replace images on any page (stored in Supabase Storage)
-- Add/edit/delete learning topics
-- Add/edit/delete subtopics and lessons
-- Insert images anywhere inside lesson content
-- Manage gallery images, videos, and PDFs
-- All changes persist in localStorage automatically
-
----
-
-## Tech Stack
-
-- React 19 + TypeScript
-- Tailwind CSS
-- Vite
-- Supabase (Auth, Database, Realtime, Storage)
-- React Router DOM
-- Vercel (hosting)
-- GitHub (source control)
+Never commit your `.env` file. It is listed in `.gitignore`.

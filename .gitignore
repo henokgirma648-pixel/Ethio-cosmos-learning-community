@@ -5,3 +5,7 @@ dist
 .env.*.local
 *.log
 .DS_Store
+ethio-cosmos/
+ethio-cosmos-source/
+"Ethio-cosmos the problem.zip"
+Ethio-cosmos*the*problem.zip

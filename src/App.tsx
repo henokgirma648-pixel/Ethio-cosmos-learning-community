@@ -17,31 +17,37 @@ import BookmarksPage from '@/pages/BookmarksPage';
 import ProgressPage from '@/pages/ProgressPage';
 import type { ReactNode } from 'react';
 
-// Protected Route Component
-const ProtectedRoute = ({ children, adminOnly = false }: { children: ReactNode, adminOnly?: boolean }) => {
+// ─── Protected Route ──────────────────────────────────────────────────────────
+
+function ProtectedRoute({
+  children,
+  adminOnly = false,
+}: {
+  children: ReactNode;
+  adminOnly?: boolean;
+}) {
   const { user, loading, isAdmin } = useAuth();
 
-  // If loading, show nothing or a loader
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">Loading…</div>
       </div>
     );
   }
 
-  // If no user, go to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // If admin required but not admin, go to home
   if (adminOnly && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
-};
+}
+
+// ─── App Routes ───────────────────────────────────────────────────────────────
 
 function AppRoutes() {
   return (
@@ -52,26 +58,67 @@ function AppRoutes() {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/learning" element={<LearningPage />} />
-          <Route path="/learning/:topicId" element={<TopicDetailPage />} />
-          <Route path="/learning/:topicId/:lessonId" element={<LessonPage />} />
+          {/* Use slug-based params throughout */}
+          <Route path="/learning/:topicSlug" element={<TopicDetailPage />} />
+          <Route path="/learning/:topicSlug/:lessonSlug" element={<LessonPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/materials" element={<MaterialsPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected Routes */}
-          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-          <Route path="/tests" element={<ProtectedRoute><TestsPage /></ProtectedRoute>} />
-          <Route path="/bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
-          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+          {/* Protected Routes (require login) */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tests"
+            element={
+              <ProtectedRoute>
+                <TestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bookmarks"
+            element={
+              <ProtectedRoute>
+                <BookmarksPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <ProgressPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Admin Route */}
-          <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
     </div>
   );
 }
+
+// ─── Root App ─────────────────────────────────────────────────────────────────
 
 function App() {
   return (
