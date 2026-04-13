@@ -171,28 +171,28 @@ export default function ChatPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pt-16 bg-[#0a0e1a] flex flex-col">
+    <div className="min-h-screen pt-16 bg-[#0d051a] flex flex-col">
       {/* Header */}
-      <div className="bg-slate-900 border-b border-white/10 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">Community Chat</h1>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            Live Community
+      <div className="bg-purple-950/40 backdrop-blur-xl border-b border-white/10 px-6 py-5 shadow-2xl">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">Community Chat</h1>
+          <div className="inline-flex items-center gap-3 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold border border-purple-500/20">
+            <span className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+            1 online
           </div>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8">
           {initialLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="text-orange-500 animate-spin" size={32} />
+            <div className="flex justify-center py-24">
+              <Loader2 className="text-purple-500 animate-spin" size={48} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400">No messages yet. Be the first to say hello! 🌌</p>
+            <div className="text-center py-24">
+              <p className="text-purple-300/40 text-xl">No messages yet. Be the first to say hello! 🌌</p>
             </div>
           ) : (
             messages.map((msg) => {
@@ -201,9 +201,9 @@ export default function ChatPage() {
               const avatarUrl = getAvatarUrl(msg);
 
               return (
-                <div key={msg.id} className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id} className={`flex items-end gap-4 ${isOwn ? 'justify-end' : 'justify-start'}`}>
                   {!isOwn && (
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-700">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 bg-purple-900/40 border border-white/10 shadow-lg">
                       {avatarUrl ? (
                         <FallbackImage
                           src={avatarUrl}
@@ -212,36 +212,38 @@ export default function ChatPage() {
                           fallbackClassName="w-full h-full"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-orange-400 text-xs font-bold">
+                        <div className="w-full h-full flex items-center justify-center text-purple-400 text-lg font-bold">
                           {displayName[0]?.toUpperCase() ?? '?'}
                         </div>
                       )}
                     </div>
                   )}
                   <div
-                    className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                      isOwn ? 'bg-orange-500 text-white' : 'bg-slate-800 text-gray-200'
+                    className={`max-w-[75%] rounded-2xl px-6 py-4 shadow-2xl border ${
+                      isOwn 
+                        ? 'bg-purple-600 border-purple-500/50 text-white rounded-br-none' 
+                        : 'bg-purple-950/40 border-white/5 text-purple-100 rounded-bl-none backdrop-blur-md'
                     }`}
                   >
                     {!isOwn && (
-                      <p className="text-xs font-semibold text-orange-400 mb-1">{displayName}</p>
+                      <p className="text-sm font-bold text-purple-400 mb-2 tracking-wide">{displayName}</p>
                     )}
                     {msg.imageUrl ? (
                       <FallbackImage
                         src={msg.imageUrl}
                         alt="Shared image"
-                        className="max-w-full rounded-lg"
-                        fallbackClassName="w-full h-40 rounded-lg"
+                        className="max-w-full rounded-xl shadow-lg border border-white/10"
+                        fallbackClassName="w-full h-56 rounded-xl"
                       />
                     ) : (
-                      <p className="break-words">{msg.text}</p>
+                      <p className="break-words text-lg leading-relaxed">{msg.text}</p>
                     )}
-                    <p className={`text-xs mt-1 ${isOwn ? 'text-orange-200' : 'text-gray-500'}`}>
+                    <p className={`text-xs mt-3 font-medium ${isOwn ? 'text-purple-200/60' : 'text-purple-300/40'}`}>
                       {formatTime(msg.timestamp)}
                     </p>
                   </div>
                   {isOwn && (
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-orange-500/20">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 bg-purple-600/20 border border-purple-500/30 shadow-lg">
                       {profile?.avatarUrl ? (
                         <FallbackImage
                           src={profile.avatarUrl}
@@ -250,7 +252,7 @@ export default function ChatPage() {
                           fallbackClassName="w-full h-full"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-orange-400 text-xs font-bold">
+                        <div className="w-full h-full flex items-center justify-center text-purple-400 text-lg font-bold">
                           {profile?.username?.[0]?.toUpperCase() ?? 'Y'}
                         </div>
                       )}
@@ -265,8 +267,8 @@ export default function ChatPage() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-slate-900 border-t border-white/10 p-4">
-        <div className="max-w-4xl mx-auto flex items-center gap-2">
+      <div className="bg-purple-950/40 backdrop-blur-2xl border-t border-white/10 p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+        <div className="max-w-5xl mx-auto flex items-center gap-4">
           <input
             type="file"
             accept="image/*"
@@ -277,12 +279,12 @@ export default function ChatPage() {
           <Button
             variant="outline"
             size="icon"
-            className="border-white/20 text-gray-400 hover:text-white hover:bg-white/10"
+            className="w-14 h-14 border-white/10 text-purple-300 hover:text-white hover:bg-purple-500/20 rounded-2xl transition-all"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             title="Share image"
           >
-            {uploading ? <Loader2 size={20} className="animate-spin" /> : <Paperclip size={20} />}
+            {uploading ? <Loader2 size={24} className="animate-spin" /> : <Paperclip size={24} />}
           </Button>
           <Input
             type="text"
@@ -290,15 +292,15 @@ export default function ChatPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
-            className="flex-1 bg-slate-800 border-white/20 text-white placeholder:text-gray-500"
+            className="flex-1 h-14 bg-purple-900/20 border-white/10 text-white placeholder:text-purple-300/30 rounded-2xl px-6 text-lg focus:ring-purple-500/50"
             disabled={uploading}
           />
           <Button
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl shadow-lg shadow-purple-500/20 transition-all"
             onClick={sendMessage}
             disabled={!newMessage.trim() || uploading}
           >
-            <Send size={20} />
+            <Send size={24} />
           </Button>
         </div>
       </div>

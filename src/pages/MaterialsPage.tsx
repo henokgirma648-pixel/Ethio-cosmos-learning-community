@@ -14,7 +14,7 @@ export default function MaterialsPage() {
 
   if (dataLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0e1a]">
+      <div className="min-h-screen flex items-center justify-center bg-[#0d051a]">
         <div className="text-white">Loading...</div>
       </div>
     );
@@ -23,37 +23,37 @@ export default function MaterialsPage() {
   const { galleryImages, videos, pdfs } = materials;
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-16 bg-[#0d051a]">
       {/* Hero Section */}
       <section
-        className="py-20 relative"
+        className="py-32 relative"
         style={{
           backgroundImage:
-            'linear-gradient(to bottom, rgba(5, 8, 16, 0.7), rgba(10, 14, 26, 0.9)), url(/images/materials-hero.jpg)',
+            'linear-gradient(to bottom, rgba(13, 5, 26, 0.7), rgba(13, 5, 26, 0.9)), url(/images/materials-hero.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 tracking-tight">
             Our Materials
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-2xl text-purple-100/70 max-w-3xl mx-auto leading-relaxed">
             Explore and access our collection of resources related to space science and astronomy.
           </p>
         </div>
       </section>
 
       {/* Materials Section */}
-      <section className="py-20 bg-[#0a0e1a]">
+      <section className="py-32 bg-[#0d051a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             {/* Image Gallery Card */}
-            <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-white/10 p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Image Gallery</h3>
-              <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="bg-purple-950/20 rounded-2xl overflow-hidden border border-white/5 p-10 shadow-2xl hover:border-purple-500/30 transition-all group">
+              <h3 className="text-2xl font-bold text-white mb-8 tracking-tight">Image Gallery</h3>
+              <div className="grid grid-cols-2 gap-4 mb-8">
                 {galleryImages.slice(0, 4).map((img) => (
-                  <div key={img.id} className="aspect-square rounded-lg overflow-hidden">
+                  <div key={img.id} className="aspect-square rounded-xl overflow-hidden shadow-lg">
                     <FallbackImage
                       src={img.url}
                       alt={img.title}
@@ -64,21 +64,21 @@ export default function MaterialsPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-gray-400 text-sm mb-4">Browse Our Photos</p>
+              <p className="text-purple-300/50 text-lg mb-8">Browse Our Photos</p>
               <Button
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-8 text-lg rounded-xl shadow-lg shadow-purple-500/10 transition-all"
                 onClick={() => setGalleryOpen(true)}
               >
-                <Image size={18} className="mr-2" />
+                <Image size={24} className="mr-3" />
                 View Gallery
               </Button>
             </div>
 
             {/* Video Collection Card */}
-            <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-white/10 p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Video Collection</h3>
+            <div className="bg-purple-950/20 rounded-2xl overflow-hidden border border-white/5 p-10 shadow-2xl hover:border-purple-500/30 transition-all group">
+              <h3 className="text-2xl font-bold text-white mb-8 tracking-tight">Video Collection</h3>
               <div
-                className="aspect-video rounded-lg overflow-hidden bg-slate-800 relative mb-4 group cursor-pointer"
+                className="aspect-video rounded-xl overflow-hidden bg-purple-900/20 relative mb-8 group cursor-pointer shadow-lg"
                 onClick={() => setVideoOpen(true)}
               >
                 {videos[0] ? (
@@ -90,47 +90,47 @@ export default function MaterialsPage() {
                       fallbackClassName="w-full h-full"
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/30 transition-colors">
-                      <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center">
-                        <Play size={24} className="text-white ml-1" />
+                      <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center shadow-2xl shadow-purple-500/40 group-hover:scale-110 transition-transform">
+                        <Play size={32} className="text-white ml-1" />
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-600">
-                    <Play size={40} />
+                  <div className="w-full h-full flex items-center justify-center text-purple-300/20">
+                    <Play size={60} />
                   </div>
                 )}
               </div>
-              <p className="text-gray-400 text-sm mb-4">Watch Our Videos</p>
+              <p className="text-purple-300/50 text-lg mb-8">Watch Our Videos</p>
               <Button
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-8 text-lg rounded-xl shadow-lg shadow-purple-500/10 transition-all"
                 onClick={() => setVideoOpen(true)}
               >
-                <Play size={18} className="mr-2" />
+                <Play size={24} className="mr-3" />
                 View Videos
               </Button>
             </div>
 
             {/* PDF Documents Card */}
-            <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-white/10 p-6">
-              <h3 className="text-xl font-bold text-white mb-4">PDF Documents</h3>
-              <div className="flex gap-4 mb-4">
+            <div className="bg-purple-950/20 rounded-2xl overflow-hidden border border-white/5 p-10 shadow-2xl hover:border-purple-500/30 transition-all group">
+              <h3 className="text-2xl font-bold text-white mb-8 tracking-tight">PDF Documents</h3>
+              <div className="flex gap-6 mb-8">
                 {pdfs.map((pdf) => (
                   <div
                     key={pdf.id}
-                    className="flex-1 flex flex-col items-center p-4 bg-slate-800 rounded-lg"
+                    className="flex-1 flex flex-col items-center p-6 bg-purple-900/20 rounded-xl border border-white/5 shadow-inner"
                   >
-                    <FileText size={48} className="text-orange-500 mb-2" />
-                    <span className="text-xs text-gray-400 text-center">{pdf.label}</span>
+                    <FileText size={64} className="text-purple-500 mb-4" />
+                    <span className="text-sm text-purple-300/60 text-center font-medium">{pdf.label}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-gray-400 text-sm mb-4">Download Resources</p>
+              <p className="text-purple-300/50 text-lg mb-8">Download Resources</p>
               <Button
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-8 text-lg rounded-xl shadow-lg shadow-purple-500/10 transition-all"
                 onClick={() => setPdfOpen(true)}
               >
-                <FileText size={18} className="mr-2" />
+                <FileText size={24} className="mr-3" />
                 View PDFs
               </Button>
             </div>
@@ -140,21 +140,21 @@ export default function MaterialsPage() {
 
       {/* Gallery Modal */}
       <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
-        <DialogContent className="max-w-4xl bg-slate-900 border-white/10">
+        <DialogContent className="max-w-5xl bg-purple-950/95 backdrop-blur-2xl border-white/10 rounded-3xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Image Gallery</DialogTitle>
+            <DialogTitle className="text-3xl font-bold text-white mb-6">Image Gallery</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-4 max-h-[70vh] overflow-y-auto p-2">
             {galleryImages.map((img) => (
               <div
                 key={img.id}
-                className="aspect-square rounded-lg overflow-hidden cursor-pointer"
+                className="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-xl border border-white/5"
                 onClick={() => setSelectedImage(img.url)}
               >
                 <FallbackImage
                   src={img.url}
                   alt={img.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform"
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                   fallbackClassName="w-full h-full"
                 />
               </div>
@@ -165,13 +165,13 @@ export default function MaterialsPage() {
 
       {/* Image Preview Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-4xl bg-slate-900 border-white/10 p-0">
+        <DialogContent className="max-w-5xl bg-black/90 border-none p-0 overflow-hidden rounded-3xl">
           {selectedImage && (
             <FallbackImage
               src={selectedImage}
               alt="Preview"
-              className="w-full h-auto rounded-lg"
-              fallbackClassName="w-full h-64 rounded-lg"
+              className="w-full h-auto"
+              fallbackClassName="w-full h-96 rounded-3xl"
             />
           )}
         </DialogContent>
@@ -179,18 +179,18 @@ export default function MaterialsPage() {
 
       {/* Video Modal */}
       <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
-        <DialogContent className="max-w-3xl bg-slate-900 border-white/10">
+        <DialogContent className="max-w-4xl bg-purple-950/95 backdrop-blur-2xl border-white/10 rounded-3xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Video Collection</DialogTitle>
+            <DialogTitle className="text-3xl font-bold text-white mb-6">Video Collection</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 mt-4">
+          <div className="space-y-8 mt-4 max-h-[70vh] overflow-y-auto p-2">
             {videos.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No videos available yet.</p>
+              <p className="text-purple-300/40 text-center py-16 text-xl">No videos available yet.</p>
             ) : (
               videos.map((video) => (
-                <div key={video.id} className="space-y-1">
-                  <p className="text-sm text-gray-400">{video.title}</p>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-slate-800">
+                <div key={video.id} className="space-y-4">
+                  <p className="text-lg font-semibold text-purple-100/80">{video.title}</p>
+                  <div className="aspect-video rounded-2xl overflow-hidden bg-black/40 shadow-2xl border border-white/5">
                     <FallbackVideo
                       src={video.url}
                       poster={video.thumbnail}
@@ -207,16 +207,18 @@ export default function MaterialsPage() {
 
       {/* PDF Modal */}
       <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
-        <DialogContent className="max-w-2xl bg-slate-900 border-white/10">
+        <DialogContent className="max-w-3xl bg-purple-950/95 backdrop-blur-2xl border-white/10 rounded-3xl">
           <DialogHeader>
-            <DialogTitle className="text-white">PDF Documents</DialogTitle>
+            <DialogTitle className="text-3xl font-bold text-white mb-6">PDF Documents</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 mt-4">
+          <div className="space-y-6 mt-4 max-h-[70vh] overflow-y-auto p-2">
             {pdfs.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No PDFs available yet.</p>
+              <p className="text-purple-300/40 text-center py-16 text-xl">No PDFs available yet.</p>
             ) : (
               pdfs.map((pdf) => (
-                <FallbackPdfLink key={pdf.id} src={pdf.url} title={pdf.title} />
+                <div key={pdf.id} className="bg-purple-900/20 p-6 rounded-2xl border border-white/5 hover:bg-purple-900/30 transition-colors">
+                  <FallbackPdfLink src={pdf.url} title={pdf.title} />
+                </div>
               ))
             )}
           </div>

@@ -50,30 +50,30 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col">
       {/* Top Main Navbar */}
-      <div className="bg-slate-950/80 backdrop-blur-md border-b border-white/10">
+      <div className="bg-purple-950/80 backdrop-blur-xl border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl">🔭</span>
-              <span className="font-bold text-white text-sm sm:text-base hidden sm:inline">
-                Ethio-cosmos-learning-community
+            <Link to="/" className="flex items-center gap-3 group">
+              <span className="text-3xl group-hover:scale-110 transition-transform">🔭</span>
+              <span className="font-extrabold text-white text-lg sm:text-xl hidden sm:inline tracking-tight">
+                Ethio-cosmos
               </span>
-              <span className="font-bold text-white text-sm sm:hidden">
+              <span className="font-extrabold text-white text-lg sm:hidden tracking-tight">
                 Ethio-cosmos
               </span>
             </Link>
 
             {/* Desktop Navigation (Main) */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-2">
               {publicNavLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                  className={`px-4 py-2 text-base font-bold transition-all rounded-xl ${
                     isActive(link.path)
-                      ? 'text-orange-500 bg-orange-500/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                      ? 'text-purple-400 bg-purple-500/10 shadow-inner'
+                      : 'text-purple-100/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {link.label}
@@ -82,10 +82,10 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                  className={`px-4 py-2 text-base font-bold transition-all rounded-xl ${
                     isActive('/admin')
-                      ? 'text-orange-500 bg-orange-500/10'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                      ? 'text-purple-400 bg-purple-500/10 shadow-inner'
+                      : 'text-purple-100/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   Admin
@@ -101,62 +101,62 @@ export default function Navbar() {
                     <div className="relative" ref={profileMenuRef}>
                       <button
                         onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                        className="flex items-center gap-2 p-1 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-3 p-1.5 rounded-2xl border border-white/10 hover:bg-white/5 transition-all shadow-lg"
                       >
                         {profile?.avatarUrl ? (
                           <img 
                             src={profile.avatarUrl} 
                             alt="Profile" 
-                            className="w-8 h-8 rounded-full border border-orange-500/50" 
+                            className="w-9 h-9 rounded-xl border-2 border-purple-500/50 object-cover" 
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                            <UserIcon size={18} />
+                          <div className="w-9 h-9 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+                            <UserIcon size={20} />
                           </div>
                         )}
-                        <span className="text-gray-300 text-sm hidden md:inline max-w-[120px] truncate">
+                        <span className="text-purple-100 font-bold text-sm hidden md:inline max-w-[120px] truncate">
                           {profile?.username || user.email?.split('@')[0]}
                         </span>
                       </button>
 
                       {/* Profile Dropdown */}
                       {profileMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-white/10 rounded-lg shadow-xl py-2 z-[60]">
-                          <div className="px-4 py-2 border-b border-white/5 mb-2">
-                            <p className="text-sm font-medium text-white truncate">
+                        <div className="absolute right-0 mt-3 w-56 bg-purple-950/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl py-3 z-[60] overflow-hidden">
+                          <div className="px-5 py-3 border-b border-white/5 mb-2">
+                            <p className="text-base font-bold text-white truncate">
                               {profile?.username || 'User'}
                             </p>
-                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                            <p className="text-xs text-purple-300/50 truncate">{user.email}</p>
                           </div>
                           <Link
                             to="/profile"
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                            className="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-purple-100 hover:bg-purple-500/20 hover:text-white transition-colors"
                             onClick={() => setProfileMenuOpen(false)}
                           >
-                            <UserCircle size={16} />
+                            <UserCircle size={18} className="text-purple-400" />
                             Profile
                           </Link>
                           <Link
                             to="/progress"
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                            className="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-purple-100 hover:bg-purple-500/20 hover:text-white transition-colors"
                             onClick={() => setProfileMenuOpen(false)}
                           >
-                            <BarChart3 size={16} />
+                            <BarChart3 size={18} className="text-purple-400" />
                             Progress
                           </Link>
                           <Link
                             to="/bookmarks"
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                            className="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-purple-100 hover:bg-purple-500/20 hover:text-white transition-colors"
                             onClick={() => setProfileMenuOpen(false)}
                           >
-                            <BookOpen size={16} />
+                            <BookOpen size={18} className="text-purple-400" />
                             Bookmarks
                           </Link>
                           <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors mt-2 border-t border-white/5 pt-2"
+                            className="w-full flex items-center gap-3 px-5 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 transition-colors mt-2 border-t border-white/5 pt-3"
                           >
-                            <LogOut size={16} />
+                            <LogOut size={18} />
                             Logout
                           </button>
                         </div>
@@ -164,11 +164,11 @@ export default function Navbar() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-4">
-                      <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                      <Link to="/login" className="text-sm font-bold text-purple-100 hover:text-white transition-colors">
                         Log In
                       </Link>
                       <Link to="/login">
-                        <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+                        <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl px-6 shadow-lg shadow-purple-500/20">
                           Sign Up
                         </Button>
                       </Link>
@@ -179,10 +179,10 @@ export default function Navbar() {
 
               {/* Mobile menu button */}
               <button
-                className="lg:hidden p-2 text-gray-300 hover:text-white"
+                className="lg:hidden p-2 text-purple-100 hover:text-white"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
             </div>
           </div>
@@ -190,23 +190,23 @@ export default function Navbar() {
       </div>
 
       {/* Second Fixed Navbar (Below Top Navbar) */}
-      <div className="bg-slate-950/90 backdrop-blur-md border-b border-white/10">
+      <div className="bg-purple-950/90 backdrop-blur-xl border-b border-white/5 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-12">
-            <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar">
+          <div className="flex items-center justify-center h-14">
+            <div className="flex items-center gap-6 sm:gap-12 overflow-x-auto no-scrollbar">
               {publicNavLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative px-1 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`relative px-2 py-4 text-sm font-bold transition-all whitespace-nowrap tracking-wide ${
                     isActive(link.path)
-                      ? 'text-orange-500'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-purple-400'
+                      : 'text-purple-100/40 hover:text-white'
                   }`}
                 >
                   {link.label}
                   {isActive(link.path) && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 rounded-t-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
                   )}
                 </Link>
               ))}
@@ -217,16 +217,16 @@ export default function Navbar() {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950 border-b border-white/10 py-4 px-4">
-          <div className="flex flex-col gap-1">
+        <div className="lg:hidden bg-purple-950/95 backdrop-blur-2xl border-b border-white/10 py-6 px-6 shadow-2xl">
+          <div className="flex flex-col gap-2">
             {publicNavLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                className={`px-4 py-3 text-lg font-bold transition-all rounded-xl ${
                   isActive(link.path)
-                    ? 'text-orange-500 bg-orange-500/10'
-                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    ? 'text-purple-400 bg-purple-500/10'
+                    : 'text-purple-100/70 hover:text-white hover:bg-white/5'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -236,10 +236,10 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+                className={`px-4 py-3 text-lg font-bold transition-all rounded-xl ${
                   isActive('/admin')
-                    ? 'text-orange-500 bg-orange-500/10'
-                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    ? 'text-purple-400 bg-purple-500/10'
+                    : 'text-purple-100/70 hover:text-white hover:bg-white/5'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -249,7 +249,7 @@ export default function Navbar() {
             {!user && !loading && (
               <Link
                 to="/login"
-                className="px-3 py-2 text-sm font-medium text-orange-500 hover:bg-orange-500/10 rounded-md mt-2"
+                className="px-4 py-3 text-lg font-bold text-purple-400 hover:bg-purple-500/10 rounded-xl mt-4 border border-purple-500/20 text-center"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Log In
